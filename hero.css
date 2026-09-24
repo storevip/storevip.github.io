@@ -400,3 +400,10 @@ html.hero-live .opening-sequence { position: relative; top: auto; z-index: 5; wi
 .idea-badge { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
 .idea-badge.is-dragging { cursor: grabbing; }
 .idea-badge svg { pointer-events: none; }
+
+/* Stable phone viewport: browser chrome must not resize/restart the introduction. */
+@media (pointer: coarse) {
+  html.hero-live #heroJourney, .hero.lens-hero { height: 100svh; }
+  html.hero-live { overscroll-behavior-y: none; }
+  .hero-home { touch-action: pan-y; }
+}

@@ -155,7 +155,7 @@ function frame(now) {
   const rawSpeed = Math.hypot(pointerVX, pointerVY);
   const speed = reduced ? 0 : clamp(rawSpeed / 1.85);
 
-  const canRender = !document.hidden && pageFocused;
+  const canRender = !document.hidden && (coarse || pageFocused);
 
   if (live) {
     // Continuous slower travel: no pinned/stopped phase, no gap at the hero/banner seam.
@@ -194,6 +194,7 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 addEventListener('resize', () => {
+  if (coarse && Math.abs(innerWidth - width) < 3) return;
   const xRatio = targetX / Math.max(width, 1);
   const yRatio = targetY / Math.max(height, 1);
   width = innerWidth;

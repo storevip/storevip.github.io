@@ -165,3 +165,10 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Badge supports primary-pointer drag with pointer capture and stays at its released position for the current page session.
 - Teeth rotation and hover acceleration remain independent of the stationary logo.
 - Statement section allows the badge to cross its edges without clipping.
+
+### Basic mobile compatibility
+- Fixed resize listener replaying intro when phone browser chrome changes height. Completed intro no longer restarts on orientation changes either.
+- Touch devices use a lightweight animated Canvas geometric background; unavailable/failed WebGPU also falls back to it. Its live canvas feeds the existing glass lens.
+- Mobile lens DPR limited to 1, transmission samples to 6; touch rendering no longer depends on desktop document-focus state.
+- Stable svh hero height and native vertical touch scrolling retained.
+- Production build and diff checks passed. Physical-phone appearance still needs user confirmation.

@@ -406,7 +406,13 @@
 
   replay.addEventListener('click', play);
   let resizeTimer;
-  addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(play,180)});
+  let layoutWidth = innerWidth;
+  addEventListener('resize',()=>{
+    if (Math.abs(innerWidth - layoutWidth) < 3) return;
+    layoutWidth = innerWidth;
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(()=>{ if(loader.style.display==='none') prepareCanvas(); else play(); },180);
+  });
   play();
 })();
 </script>

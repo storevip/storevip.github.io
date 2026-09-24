@@ -2,13 +2,16 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import HeroFluidGlass from './HeroFluidGlass.jsx';
 import ShapeWaves from './ShapeWaves.jsx';
+import MobileShapeWaves from './MobileShapeWaves.jsx';
 
 const heroMount = document.getElementById('heroFluidGlassMount');
 if (heroMount) createRoot(heroMount).render(<HeroFluidGlass />);
 
 const wavesMount = document.getElementById('heroShapeWavesMount');
 if (wavesMount) {
-  createRoot(wavesMount).render(
+  const wavesRoot = createRoot(wavesMount);
+  const fallback = matchMedia('(pointer: coarse)').matches || !navigator.gpu;
+  wavesRoot.render(fallback ? <MobileShapeWaves /> : (
     <ShapeWaves
       shapes="mixed"
       cellSize={10}
@@ -29,9 +32,10 @@ if (wavesMount) {
       onError={error => {
         console.error('[ShapeWaves] WebGPU initialization failed:', error);
         wavesMount.dataset.failed = 'true';
+        wavesRoot.render(<MobileShapeWaves />);
       }}
     />
-  );
+  ));
 }
 
 import NavigationWheel from './NavigationWheel.jsx';

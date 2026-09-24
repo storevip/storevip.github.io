@@ -11,7 +11,8 @@ import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
 import { MeshTransmissionMaterial, useFBO, useGLTF } from '@react-three/drei';
 import './HeroFluidGlass.css';
 
-const MAX_DPR = 2;
+const MOBILE = matchMedia('(pointer: coarse)').matches;
+const MAX_DPR = MOBILE ? 1 : 2;
 
 function useLiveCanvasTexture(selector) {
   const [texture, setTexture] = useState(null);
@@ -306,7 +307,7 @@ function HeroGlassScene({ heroSelector = '.hero-home', fieldSelector = '#heroSha
           chromaticAberration={0.06}
           anisotropy={0.01}
           roughness={0}
-          samples={12}
+          samples={MOBILE ? 6 : 12}
           transparent
           depthWrite={false}
           toneMapped={false}
@@ -325,7 +326,7 @@ export default function HeroFluidGlass() {
         dpr={[1, MAX_DPR]}
         gl={{
           alpha: true,
-          antialias: true,
+          antialias: !MOBILE,
           powerPreference: 'high-performance',
           toneMapping: THREE.NoToneMapping,
           premultipliedAlpha: false
