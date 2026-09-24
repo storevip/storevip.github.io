@@ -39,6 +39,7 @@ const OptionWheel = ({
   draggable = true,
   soundUrl = '',
   soundVolume = 0.5,
+  onSoundTick,
   className = ''
 }) => {
   const rootRef = useRef(null);
@@ -56,6 +57,7 @@ const OptionWheel = ({
   const audioRef = useRef(null);
   const audioUrlRef = useRef('');
   const lastTickRef = useRef(0);
+  const audioWarningRef = useRef(false);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelected);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -76,7 +78,8 @@ const OptionWheel = ({
     smoothing,
     draggable,
     soundUrl,
-    soundVolume
+    soundVolume,
+    onSoundTick
   };
 
   // Single rAF loop that eases the wheel position toward its target with
@@ -139,22 +142,34 @@ const OptionWheel = ({
   }, [runFrame]);
 
   // Optional tick on selection change, throttled so fast scrolling can't spam
-  // it, and with playback failures (e.g. autoplay policies) silently ignored.
+  // it. Navigation can supply an audio controller unlocked by its toggle click.
   const playTick = useCallback(() => {
-    const { soundUrl, soundVolume } = cfgRef.current;
-    if (!soundUrl) return;
+    const { soundUrl, soundVolume, onSoundTick } = cfgRef.current;
+    if (!soundUrl && !onSoundTick) return;
     const now = performance.now();
     if (now - lastTickRef.current < 70) return;
     lastTickRef.current = now;
-    if (!audioRef.current || audioUrlRef.current !== soundUrl) {
-      audioRef.current = new Audio(soundUrl);
-      audioRef.current.preload = 'auto';
-      audioUrlRef.current = soundUrl;
-    }
-    const audio = audioRef.current;
-    audio.volume = Math.min(Math.max(soundVolume, 0), 1);
-    audio.currentTime = 0;
-    audio.play()?.catch(() => {});
+    const warn = error => {
+      if (import.meta.env.DEV && !audioWarningRef.current) {
+        audioWarningRef.current = true;
+        console.warn('[OptionWheel] Click sound could not play:', error);
+      }
+    };
+    try {
+      if (onSoundTick) {
+        onSoundTick();
+        return;
+      }
+      if (!audioRef.current || audioUrlRef.current !== soundUrl) {
+        audioRef.current = new Audio(soundUrl);
+        audioRef.current.preload = 'auto';
+        audioUrlRef.current = soundUrl;
+      }
+      const audio = audioRef.current;
+      audio.volume = Math.min(Math.max(soundVolume, 0), 1);
+      audio.currentTime = 0;
+      audio.play()?.catch(warn);
+    } catch (error) { warn(error); }
   }, []);
 
   const applyTarget = useCallback(

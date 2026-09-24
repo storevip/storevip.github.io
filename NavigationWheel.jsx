@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import OptionWheel from './OptionWheel';
+import { createWheelClickSound } from './wheel-click-sound.js';
 import './NavigationWheel.css';
 
 const items = ['Home', 'About', 'Work', 'Motion', 'Poster', 'Branding', 'Digital', 'Photography'];
@@ -17,6 +18,19 @@ export default function NavigationWheel() {
   const [selected, setSelected] = useState(0);
   const toggle = useRef(null);
   const panel = useRef(null);
+  const clickSound = useRef(null);
+  useEffect(() => () => {
+    clickSound.current?.dispose();
+    clickSound.current = null;
+  }, []);
+  const handleToggle = () => {
+    if (!open) {
+      clickSound.current ??= createWheelClickSound('/sounds/click-soft.wav', .5);
+      // Must run synchronously inside the trusted click, before mounting the wheel.
+      clickSound.current.unlock();
+    }
+    setOpen(value => !value);
+  };
   useEffect(() => {
     const loader = document.getElementById('loader');
     const update = () => { const done = loader.style.display === 'none'; setReady(done); if (!done) setOpen(false); };
@@ -53,8 +67,8 @@ export default function NavigationWheel() {
   return <div className={`wheel-navigation${ready ? ' is-ready' : ''}${open ? ' is-open' : ''}${light ? ' is-light' : ''}`}>
     <div className="wheel-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
     <div ref={panel} id="wheel-menu" className="wheel-panel" role="dialog" aria-modal={open ? true : undefined} aria-label="网站导航" inert={!open}>
-      {open && <OptionWheel items={items} defaultSelected={selected} textColor={light ? "#45453e" : "#a6a6a6"} activeColor={light ? "#171714" : "#ffffff"} side="right" fontSize={3} spacing={1.65} curve={1.3} tilt={9} blur={2} fade={.25} smoothing={200} inset={80} loop draggable soundUrl="/sounds/click-soft.wav" soundVolume={.5} onChange={index => setSelected(index)} onActivate={navigate} />}
+      {open && <OptionWheel items={items} defaultSelected={selected} textColor={light ? "#45453e" : "#a6a6a6"} activeColor={light ? "#171714" : "#ffffff"} side="right" fontSize={3} spacing={1.65} curve={1.3} tilt={9} blur={2} fade={.25} smoothing={200} inset={80} loop draggable soundUrl="/sounds/click-soft.wav" soundVolume={.5} onSoundTick={() => clickSound.current?.play()} onChange={index => setSelected(index)} onActivate={navigate} />}
     </div>
-    <button ref={toggle} className="wheel-toggle" aria-label={open ? '关闭导航' : '打开导航'} aria-expanded={open} aria-controls="wheel-menu" onClick={() => setOpen(value => !value)} tabIndex={ready ? 0 : -1}><span /><span /></button>
+    <button ref={toggle} className="wheel-toggle" aria-label={open ? '关闭导航' : '打开导航'} aria-expanded={open} aria-controls="wheel-menu" onClick={handleToggle} tabIndex={ready ? 0 : -1}><span /><span /></button>
   </div>;
 }
