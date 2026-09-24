@@ -1,0 +1,348 @@
+@font-face {
+  font-family: "DINish";
+  src: url("/fonts/DINish-Bold.woff2") format("woff2"),
+       url("/fonts/DINish-Heavy.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --brand-yellow: #ffdb01;
+  --hero-black: #000000;
+  --hero-soft-black: #0a0a0a;
+  --hero-white: #f4f4f0;
+  --accent-orange: #dd5900;
+  --accent-cyan: #a6d5d6;
+  --glass-ease: cubic-bezier(.22, .75, .18, 1);
+}
+
+html.hero-live {
+  overflow-x: clip;
+  overflow-y: auto;
+  background: #f3f3ef;
+}
+
+html.hero-live body {
+  overflow: visible;
+  background: #f3f3ef;
+}
+
+html.hero-live .app {
+  height: auto;
+  overflow: visible;
+  background: #f3f3ef;
+}
+
+#heroJourney {
+  height: 100vh;
+}
+
+html.hero-live #heroJourney {
+  height: 414.9231vh;
+}
+
+.hero.lens-hero {
+  --lx: 62vw;
+  --ly: 46vh;
+  --radius: 1px;
+  --lens-opacity: 0;
+  --glass-strength: 1;
+  --lens-speed: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--hero-white);
+  background: var(--hero-black);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.hero.lens-hero::before { content: none; }
+
+.hero-shape-waves-mount {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  pointer-events: none;
+}
+
+.editorial-nav {
+  position: absolute;
+  z-index: 8;
+  top: 28px;
+  left: 38px;
+  display: flex;
+  align-items: center;
+  color: var(--hero-white);
+  transition: color .35s ease;
+}
+
+.brand-home {
+  display: inline-flex;
+  width: 28px;
+  height: 42px;
+  color: inherit;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .2s ease, transform .3s var(--glass-ease);
+}
+
+.brand-home:hover {
+  opacity: .68;
+  transform: translateY(-2px);
+}
+
+.brand-home:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 7px;
+}
+
+.brand-home svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.editorial-nav.work-visible {
+  color: #242418;
+}
+
+.english-layer,
+.chinese-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Full-viewport mask coordinates now match the lens coordinates exactly. */
+.english-layer {
+  -webkit-mask-image: radial-gradient(circle var(--radius) at var(--lx) var(--ly), rgba(0, 0, 0, calc(1 - var(--lens-reveal, 0))) 0 calc(var(--radius) - 1px), #000 calc(var(--radius) + 2px));
+  mask-image: radial-gradient(circle var(--radius) at var(--lx) var(--ly), rgba(0, 0, 0, calc(1 - var(--lens-reveal, 0))) 0 calc(var(--radius) - 1px), #000 calc(var(--radius) + 2px));
+}
+
+/* Native text takes over as the expanding lens becomes a full-page reveal. */
+.chinese-layer {
+  visibility: visible;
+  opacity: var(--chinese-crisp, 0);
+  color: var(--hero-white);
+  text-shadow: .35px 0 rgba(255, 120, 100, .28), -.35px 0 rgba(100, 190, 255, .28);
+}
+
+.title-plane {
+  position: relative;
+  width: 92vw;
+  margin: 0;
+  color: inherit;
+  font-size: min(7.5vw, 13.4vh, 148px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.045em;
+  text-align: center;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .10);
+  pointer-events: none;
+}
+
+.english-layer .title-plane {
+  color: var(--hero-white);
+  font-family: "DINish", "Helvetica Neue", Arial, sans-serif;
+  font-size: min(7.5vw, 13.4vh, 148px);
+  font-weight: 700;
+  letter-spacing: -.04em;
+}
+
+.chinese-layer .title-plane {
+  color: var(--hero-white);
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", sans-serif;
+  font-size: min(7.5vw, 13.4vh, 148px);
+  font-weight: 900;
+  letter-spacing: -.035em;
+  line-height: 1.02;
+}
+
+.title-plane span {
+  display: flex;
+  height: 1.02em;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.hero-mask {
+  position: absolute;
+  z-index: 23;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-mask.active {
+  opacity: 1;
+}
+
+.selected-section {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  overflow: auto;
+  padding: 130px 6.4vw 45px;
+  color: #242418;
+  background: #f3f3ef;
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+.selected-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 25px;
+  border-bottom: 1px solid rgba(36, 36, 24, .27);
+}
+
+.selected-heading h2 {
+  margin: 0;
+  font-size: clamp(55px, 7vw, 110px);
+  font-weight: 300;
+  letter-spacing: -.06em;
+}
+
+.selected-heading span {
+  font-size: 11px;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 30px;
+}
+
+.work-placeholder {
+  display: flex;
+  min-height: 170px;
+  height: 30vh;
+  align-items: flex-end;
+  padding: 24px;
+  background: #e8e7df;
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.work-placeholder:nth-child(2) {
+  background: var(--brand-yellow);
+}
+
+.work-note {
+  margin-top: 20px;
+  color: #65655a;
+  font-size: 12px;
+}
+
+.intro-replay {
+  position: absolute;
+  z-index: 8;
+  right: 38px;
+  bottom: 30px;
+  padding: 10px 14px;
+  border: 1px solid rgba(36, 36, 24, .34);
+  border-radius: 30px;
+  color: #242418;
+  background: transparent;
+  font: 10px "Helvetica Neue", sans-serif;
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (max-width: 700px) {
+  .editorial-nav {
+    top: 20px;
+    left: 20px;
+  }
+
+  .brand-home {
+    width: 22px;
+    height: 34px;
+  }
+
+  .english-layer .title-plane {
+    font-size: min(9.4vw, 13vh, 64px);
+    letter-spacing: -.06em;
+  }
+
+  .chinese-layer .title-plane {
+    font-size: min(9.4vw, 13vh, 64px);
+    letter-spacing: -.055em;
+  }
+
+  .work-grid {
+    gap: 12px;
+  }
+
+  .work-placeholder {
+    padding: 16px;
+  }
+
+  .selected-section {
+    padding: 110px 20px 35px;
+  }
+
+  .selected-heading span {
+    display: none;
+  }
+
+  .intro-replay {
+    right: 20px;
+  }
+}
+
+/* Reference typography: two tightly spaced pairs, separated by a larger pause. */
+@font-face {
+  font-family: "Source Han Serif";
+  src: url("/fonts/SourceHanSerifCN-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+.english-layer .title-plane,
+.chinese-layer .title-plane { text-align: center; }
+.english-layer .title-plane span,
+.chinese-layer .title-plane span { justify-content: center; }
+.english-layer .title-plane { line-height: .94; }
+.english-layer .title-plane span { height: .94em; }
+.english-layer .line-two,
+.english-layer .line-four {
+  font-family: "Source Han Serif", serif;
+  font-weight: 400;
+  letter-spacing: -.045em;
+}
+.english-layer .line-three { margin-top: .40em; }
+
+/* Reference image: line widths 374 / 550 / 720 / 475, on a 1078px canvas. */
+.english-layer .title-plane { font-size: min(9.7vw, 16.3vh, 180px); line-height: 1; }
+.english-layer .title-plane span { height: .83em; }
+.english-layer .line-two,
+.english-layer .line-four { font-size: .91em; height: .84em; letter-spacing: -.025em; }
+.english-layer .line-three { margin-top: .38em; }
+.type-fit { display: inline-block; font-weight: inherit; transform: scaleX(var(--type-scale, 1)); }
+
+/* Center Chinese glyphs optically, without full-width punctuation shifting them. */
+.chinese-layer .title-plane { width: 100%; margin: 0 auto; }
+.chinese-layer .title-plane > span { width: 100%; text-align: center; justify-content: center; }
+.chinese-word { position: relative; display: inline-block; font-weight: inherit; }
+.chinese-punctuation { position: absolute; left: 100%; top: 0; font-style: normal; font-weight: inherit; }
+
+/* Zero-size marker exposes the actual browser text baseline to the lens canvas. */
+.chinese-baseline { display: inline-block; width: 0; height: 0; padding: 0; margin: 0; vertical-align: baseline; }

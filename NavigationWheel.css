@@ -1,0 +1,32 @@
+.wheel-navigation { position: fixed; inset: 0; z-index: 50; pointer-events: none; font-family: "Helvetica Neue", Arial, sans-serif; }
+.wheel-toggle { position: absolute; right: 24px; top: 50%; width: 48px; height: 48px; margin-top: -24px; padding: 12px; border: 1px solid rgba(255,255,255,.28); border-radius: 50%; background: rgba(0,0,0,.5); color: white; opacity: 0; visibility: hidden; cursor: pointer; transition: opacity .35s, transform .45s cubic-bezier(.34,1.4,.64,1); transform: translateX(20px); }
+.is-ready .wheel-toggle { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(0); }
+.wheel-toggle span { display: block; height: 1px; width: 22px; background: currentColor; margin: 6px 0; transition: transform .3s; }
+.is-open .wheel-toggle span:first-child { transform: translateY(3.5px) rotate(45deg); }
+.is-open .wheel-toggle span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
+.wheel-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0); backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); visibility: hidden; transition: background .35s, backdrop-filter .35s, visibility .35s; }
+.is-open .wheel-backdrop { visibility: visible; pointer-events: auto; background: rgba(0,0,0,.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.wheel-panel { position: absolute; right: 0; top: 12vh; width: min(520px,100vw); height: 76vh; visibility: hidden; opacity: 0; transform: translateX(45px) scale(.96); transform-origin: right center; transition: transform .5s cubic-bezier(.34,1.35,.64,1), opacity .25s, visibility .5s; }
+.is-open .wheel-panel { visibility: visible; opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+.wheel-go { position: absolute; right: 80px; bottom: 12%; padding: 10px 0; border: 0; border-bottom: 1px solid #ffffff55; background: transparent; color: white; font: inherit; cursor: pointer; }
+.wheel-toggle:focus-visible,.wheel-go:focus-visible,.option-wheel:focus-visible { outline: 2px solid #ffdb01; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .wheel-navigation * { transition-duration: .01ms !important; } }
+
+/* The wheel fills the right side, with roughly five visible rows. */
+.wheel-panel { top: 4vh; height: 92vh; width: min(580px, 100vw); }
+
+/* Pull the center of the arc inward; outer rows curve back toward the edge. */
+.wheel-panel { width: min(760px, 100vw); }
+.wheel-panel .option-wheel { --ow-inset: clamp(100px, 15vw, 285px) !important; }
+.is-light .wheel-toggle { background: rgba(255,255,255,.65); color: #171714; border-color: rgba(0,0,0,.35); }
+@media (max-width: 700px) {
+  .wheel-panel .option-wheel { --ow-inset: 100px !important; --ow-font-size: 2.4rem !important; }
+}
+
+/* A restrained pulse makes the closed navigation control discoverable. */
+.is-ready:not(.is-open) .wheel-toggle { animation: menu-breathe 2.8s ease-in-out infinite; border-color: rgba(255,255,255,.75); }
+@keyframes menu-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,219,1,0); }
+  50% { box-shadow: 0 0 0 7px rgba(255,219,1,.15), 0 0 20px rgba(255,219,1,.24); }
+}
+@media (prefers-reduced-motion: reduce) { .wheel-toggle { animation: none !important; } }

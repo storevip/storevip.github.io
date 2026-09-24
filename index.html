@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>F Portfolio Intro</title>
+<style>
+  :root{--yellow:#ffdb01;--black:#000;--white:#fff;--ease:cubic-bezier(.22,.75,.18,1)}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#000;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;overflow:hidden}
+  body{color:#111}
+  .app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#000}
+
+  .hero{position:absolute;inset:0;background:#000;color:#fff;overflow:hidden}
+  .hero-ui{position:absolute;inset:0;padding:32px 38px;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+  .hero-nav{display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:11px;letter-spacing:.08em}
+  .hero-links{display:flex;gap:24px}
+  .hero-title{max-width:780px;margin:0 0 52px 0}
+  .hero-kicker{font-size:10px;letter-spacing:.18em;opacity:.7;margin-bottom:16px}
+  .hero-title h1{font-size:clamp(56px,8.2vw,132px);line-height:.82;letter-spacing:-.065em;font-weight:500;margin:0}
+  .hero-title p{font-size:11px;letter-spacing:.09em;margin:24px 0 0;color:rgba(255,255,255,.74)}
+  .hero-foot{display:flex;justify-content:space-between;gap:20px;font-size:10px;letter-spacing:.08em;opacity:.7}
+
+  .loader{position:absolute;inset:0;background:#000;z-index:20;overflow:hidden}
+  .tiles{position:absolute;inset:0;background:#000;overflow:hidden}
+  .tile{
+    position:absolute;
+    background:var(--yellow);
+    opacity:0;
+    transition:opacity 170ms linear var(--delay);
+  }
+  .tile.in{opacity:1}
+  .tiles::after{content:"";position:absolute;inset:0;background:var(--yellow);opacity:0;pointer-events:none;transition:opacity 320ms linear}
+  .tiles.settled::after{opacity:1}
+
+  .logo-fixed{position:absolute;left:50%;top:50%;width:clamp(70px,7vw,128px);aspect-ratio:288/486;transform:translate(-50%,-50%);z-index:24;pointer-events:none}
+  .logo-fixed svg{display:block;width:100%;height:100%}
+  .logo-fixed path{fill:#000}
+  .logo-fixed .logo-ink path{fill:#000}
+  .logo-cell{fill:#fff;opacity:0;transition:opacity 170ms linear var(--delay)}
+  .logo-cell.in{opacity:1}
+
+  .load-info{position:absolute;left:28px;bottom:24px;z-index:25;color:#fff;font-size:10px;line-height:1.55;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums;pointer-events:none}
+  .load-info .pct{display:block;font-size:clamp(48px,12vmin,158px);line-height:1;letter-spacing:-.045em;margin:0;font-weight:500}
+
+  .number-cell{position:absolute;overflow:hidden;color:#000;opacity:0;transition:opacity 170ms linear var(--delay)}
+  .number-cell.in{opacity:1}
+  .number-cell .pct{position:absolute;white-space:nowrap}
+  .load-info{transition:opacity .32s ease,filter .32s ease}
+  .load-info.digits-gone{opacity:0;filter:blur(2px)}
+  .tiles.flat{background:var(--yellow)}
+  .load-info.solid{color:#000}
+  .load-info.solid .number-cell{display:none}
+  .logo-fixed.solid > svg > path{fill:#000}
+  .logo-fixed.solid .logo-ink{display:none}
+  .scroll-hint{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:26;width:59.8px;height:80.6px;padding:0;border:0;background:transparent;color:#000;cursor:pointer;opacity:0;visibility:hidden;transition:opacity .25s}
+  .scroll-hint.visible{opacity:1;visibility:visible}
+  .scroll-hint svg{width:33.8px;height:52px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .scroll-hint .wheel{animation:wheelDown 1.4s ease-in-out infinite}
+  @keyframes wheelDown{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(5px);opacity:1}}
+  @media(prefers-reduced-motion:reduce){.scroll-hint .wheel{animation:none}}
+  .hero-mask{position:absolute;inset:0;width:100%;height:100%;z-index:23;opacity:0;pointer-events:none}
+  .hero-mask.active{opacity:1}
+  .logo-fixed.reveal{opacity:0;transition:none}
+
+  .replay{position:absolute;right:22px;bottom:20px;z-index:5;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.24);color:#fff;border-radius:999px;padding:11px 15px;font:300 10px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;cursor:pointer;backdrop-filter:blur(8px)}
+  .replay:hover{background:rgba(255,255,255,.08)}
+  .replay:focus{outline:2px solid #fff;outline-offset:2px}
+
+  @media(max-width:700px){
+    .hero-ui{padding:24px 20px}
+    .hero-links{display:none}
+    .hero-title{margin-bottom:72px}
+    .hero-title h1{font-size:clamp(50px,16vw,82px)}
+    .load-info{left:18px;bottom:18px}
+    .logo-fixed{width:82px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .tile,.logo-cell,.number-cell{transition-duration:.01ms!important;transition-delay:0ms!important}
+  }
+</style>
+<link rel="stylesheet" href="./hero.css?direct">
+</head>
+<body>
+<div class="app" id="app">
+  <div id="heroJourney"><section class="hero lens-hero" id="top" aria-label="Portfolio homepage">
+    <div id="heroShapeWavesMount" class="hero-shape-waves-mount" aria-hidden="true"></div>
+    <nav class="editorial-nav" aria-label="Home"><a class="brand-home" href="./index.html" aria-label="返回首页"><svg viewBox="816 297 288 486" aria-hidden="true"><path d="M816.273438 356.550781V474.578125L1103.726562 415.058594V297.035023L816.273438 356.550781Z"/><path d="M929.59375 474.59375H816.273438V782.964844H929.59375V605.121094H929.601562C929.601562 595.628906 937.28125 587.941406 946.769531 587.941406H1103.726562V474.59375H929.59375Z"/></svg></a></nav>
+    <div id="heroFluidGlassMount" class="hero-fluid-glass-mount" aria-hidden="true"></div>
+    <div class="english-layer"><h1 class="title-plane"><span class="line-one"><b class="type-fit">VISUAL</b></span><span class="line-two"><b class="type-fit">THINKING,</b></span><span class="line-three"><b class="type-fit">SHAPED WITH</b></span><span class="line-four"><b class="type-fit">PURPOSE.</b></span></h1></div>
+    <div class="chinese-layer" aria-hidden="true"><div class="title-plane" lang="zh-CN"><span class="line-one"><b class="chinese-word">以视觉<i class="chinese-baseline" aria-hidden="true"></i></b></span><span class="line-two"><b class="chinese-word">思考<i class="chinese-baseline" aria-hidden="true"></i><i class="chinese-punctuation">，</i></b></span><span class="line-three"><b class="chinese-word">用设计<i class="chinese-baseline" aria-hidden="true"></i></b></span><span class="line-four"><b class="chinese-word">表达<i class="chinese-baseline" aria-hidden="true"></i><i class="chinese-punctuation">。</i></b></span></div></div>
+    <section class="selected-section" id="selectedWork" aria-label="Selected Work"><div class="selected-heading"><h2>Selected Work</h2><span>AN EDITED SELECTION / 2026</span></div><div class="work-grid"><div class="work-placeholder">01 / PROJECT TO COME</div><div class="work-placeholder">02 / PROJECT TO COME</div></div><p class="work-note">作品展示占位 · 待加入真实项目素材</p></section>
+    <button class="intro-replay" id="replay" type="button">REPLAY INTRO</button>
+  </section></div>
+
+  <canvas class="hero-mask" id="heroMask" aria-hidden="true"></canvas>
+
+  <section class="loader" id="loader" aria-label="Loading animation">
+    <div class="tiles" id="tiles"></div>
+    <div class="logo-fixed" id="logoFixed" aria-label="F logo">
+      <svg viewBox="816 297 288 486" role="img" aria-hidden="true"><defs><mask id="logoWaveMask" maskUnits="userSpaceOnUse" x="816" y="297" width="288" height="486"><g id="logoWaveCells"></g></mask></defs>
+        <path d="M816.273438 356.550781V474.578125L1103.726562 415.058594V297.035023L816.273438 356.550781Z"/>
+        <path d="M929.59375 474.59375H816.273438V782.964844H929.59375V605.121094H929.601562C929.601562 595.628906 937.28125 587.941406 946.769531 587.941406H1103.726562V474.59375H929.59375Z"/>
+      <g class="logo-ink" mask="url(#logoWaveMask)">
+        <path d="M816.273438 356.550781V474.578125L1103.726562 415.058594V297.035023L816.273438 356.550781Z"/>
+        <path d="M929.59375 474.59375H816.273438V782.964844H929.59375V605.121094H929.601562C929.601562 595.628906 937.28125 587.941406 946.769531 587.941406H1103.726562V474.59375H929.59375Z"/>
+      </g></svg>
+    </div>
+    <button class="scroll-hint" id="scrollHint" type="button" aria-label="向下滚动放大 F，或点击进入首页" title="向下滚动"><svg viewBox="0 0 26 40" aria-hidden="true"><rect x="4" y="1" width="18" height="29" rx="9"/><path class="wheel" d="M13 7v6"/><path d="m9 35 4 4 4-4"/></svg></button>
+    <div class="load-info" id="loadInfo"><span class="pct" id="pct">000</span></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const app = document.getElementById('app');
+  const tilesEl = document.getElementById('tiles');
+  const loader = document.getElementById('loader');
+  const logo = document.getElementById('logoFixed');
+  const pct = document.getElementById('pct');
+  const heroMask = document.getElementById('heroMask');
+  const ctx = heroMask.getContext('2d');
+  const fPath = new Path2D();
+  document.querySelectorAll('#logoFixed > svg > path').forEach(path=>fPath.addPath(new Path2D(path.getAttribute('d'))));
+  let canvasWidth=0,canvasHeight=0,canvasDpr=1;
+  function prepareCanvas(){
+    canvasWidth=innerWidth;canvasHeight=innerHeight;
+    canvasDpr=Math.min(devicePixelRatio||1,1.5);
+    heroMask.width=Math.round(canvasWidth*canvasDpr);
+    heroMask.height=Math.round(canvasHeight*canvasDpr);
+  }
+  function renderPortal(progress){
+    const size=zoomBase*Math.pow(zoomRatio,progress),scale=size/288;
+    const tx=canvasWidth/2-(816+144)*scale;
+    const ty=canvasHeight/2-(297+243)*scale;
+    ctx.setTransform(canvasDpr,0,0,canvasDpr,0,0);
+    ctx.clearRect(0,0,canvasWidth,canvasHeight);
+    const aperture=new Path2D();
+    aperture.addPath(fPath,new DOMMatrix([scale,0,0,scale,tx,ty]));
+    const shape=new Path2D();shape.rect(0,0,canvasWidth,canvasHeight);
+    shape.addPath(aperture);
+    ctx.fillStyle='#ffdb01';ctx.fill(shape,'evenodd');
+    // Only the black fill inside F recedes, driven by the same scroll progress as its scale.
+    const revealProgress=Math.max(0,Math.min(1,progress/(zoomEndProgress*.85)));
+    const reveal=revealProgress*revealProgress*(3-2*revealProgress);
+    ctx.fillStyle=`rgba(0,0,0,${1-reveal})`;
+    ctx.fill(aperture);
+  }
+  function portalCoversViewport(progress){
+    const scale=zoomBase*Math.pow(zoomRatio,progress)/288;
+    // This rectangle lies entirely inside F's middle bar around the zoom anchor (960, 540).
+    return canvasWidth/(2*scale)<=142 && canvasHeight/(2*scale)<=42;
+  }
+  function hidePortal(){
+    heroMask.classList.remove('active');
+    heroMask.style.removeProperty('opacity');
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,heroMask.width,heroMask.height);
+  }
+  const replay = document.getElementById('replay');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let timers = [];
+  let raf = 0;
+  let growRaf = 0;
+  const info = document.getElementById('loadInfo');
+  const hint = document.getElementById('scrollHint');
+  let ready = false, zooming = false, targetZoom = 0, currentZoom = 0, zoomTime = 0, zoomEndProgress = 1;
+  let zoomVelocity = 0, zoomBase = 100, zoomRatio = 100;
+
+  function advanceZoom(delta){
+    if(!ready) return;
+    targetZoom = Math.max(0,Math.min(zoomEndProgress,targetZoom + delta/1500*zoomEndProgress));
+    if(!zooming && (targetZoom>0 || currentZoom>0)){
+      zooming = true;
+      renderPortal(currentZoom);
+      heroMask.classList.add('active');
+      loader.style.visibility='hidden';
+      logo.classList.add('reveal');
+      hint.classList.remove('visible');
+      zoomTime = performance.now();
+      growRaf = requestAnimationFrame(updateZoom);
+    }
+  }
+  function updateZoom(now){
+    const dt = Math.max(0,Math.min(64,now-zoomTime))/1000; zoomTime = now;
+    // Exact critically damped spring: continuous velocity across wheel events.
+    const omega = 8;
+    const offset = currentZoom-targetZoom;
+    const impulse = zoomVelocity+omega*offset;
+    const decay = Math.exp(-omega*dt);
+    currentZoom = reduce ? targetZoom : targetZoom+(offset+impulse*dt)*decay;
+    zoomVelocity = reduce ? 0 : (zoomVelocity-omega*impulse*dt)*decay;
+    currentZoom = Math.max(0,Math.min(1,currentZoom));
+    renderPortal(currentZoom);
+    if(targetZoom>=zoomEndProgress-.0001 && currentZoom>=zoomEndProgress-.002 && portalCoversViewport(currentZoom)){
+      ready=false; zooming=false;
+      loader.style.display='none';
+      hidePortal();
+      return;
+    }
+    if(Math.abs(targetZoom-currentZoom)<.0001 && Math.abs(zoomVelocity)<.001){
+      currentZoom=targetZoom; zoomVelocity=0; zooming=false;renderPortal(currentZoom);
+      if(targetZoom===0){loader.style.visibility='visible';loader.style.opacity='1';hidePortal();logo.classList.remove('reveal');hint.classList.add('visible')}
+      return;
+    }
+    growRaf=requestAnimationFrame(updateZoom);
+  }
+  addEventListener('wheel',event=>{
+    if(!ready)return;
+    event.preventDefault();
+    const unit=event.deltaMode===1?16:event.deltaMode===2?innerHeight:1;
+    advanceZoom(event.deltaY*unit);
+  },{passive:false});
+  hint.addEventListener('click',()=>advanceZoom(1500));
+  addEventListener('keydown',event=>{
+    if(!ready || event.target===hint || event.target===replay)return;
+    if(['ArrowDown','PageDown',' '].includes(event.key)){event.preventDefault();advanceZoom(300)}
+    if(['ArrowUp','PageUp'].includes(event.key)){event.preventDefault();advanceZoom(-300)}
+  });
+  let touchY=null;
+  app.addEventListener('touchstart',event=>{touchY=event.touches[0].clientY},{passive:true});
+  app.addEventListener('touchmove',event=>{
+    if(!ready || touchY===null)return;
+    event.preventDefault();
+    const y=event.touches[0].clientY;advanceZoom((touchY-y)*3);touchY=y;
+  },{passive:false});
+
+  let numberCopies = [];
+  function setProgress(value){
+    pct.textContent = value;
+    numberCopies.forEach(el => el.textContent = value);
+    if(value==='100') info.classList.add('digits-gone');
+  }
+
+  function buildTiles(){
+    document.querySelectorAll('.number-cell').forEach(el => el.remove());
+    numberCopies = [];
+    const numberBounds = pct.getBoundingClientRect();
+    const info = document.getElementById('loadInfo');
+    const infoBounds = info.getBoundingClientRect();
+    tilesEl.innerHTML = '';
+    tilesEl.classList.remove('settled');
+    const all = [];
+    const maskCells = document.getElementById('logoWaveCells');
+    maskCells.replaceChildren();
+    const logoBounds = logo.getBoundingClientRect();
+    const svgScale = 288 / logoBounds.width;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // One fixed square size for every block in the frame.
+    const tileSize = 32;
+    const pitch = tileSize;
+    const cols = Math.ceil(vw / pitch);
+    const rows = Math.ceil(vh / pitch);
+    const maxDistance = Math.hypot(cols - 1, rows - 1) || 1;
+
+    for(let row = 0; row < rows; row++){
+      for(let col = 0; col < cols; col++){
+        const el = document.createElement('div');
+        el.className = 'tile';
+        el.style.left = (col * pitch) + 'px';
+        el.style.top = (row * pitch) + 'px';
+        el.style.width = tileSize + 'px';
+        el.style.height = tileSize + 'px';
+        // Concentric, subtly undulating fronts travel away from the top-left.
+        // Only reveal timing changes; every square keeps its size and position.
+        const distance = Math.hypot(col, row);
+        const angle = Math.atan2(row, col);
+        const ripple = Math.sin(angle * 6 + distance * .24) * .75;
+        const wave = Math.max(0, distance + ripple) / maxDistance;
+        const delay = 120 + wave * 2350;
+        const duration = 170;
+        el.style.setProperty('--delay', delay + 'ms');
+        tilesEl.appendChild(el);
+        all.push({el, end: delay + duration});
+        // Copy the exact background cell geometry and timing into the black logo mask.
+        const left = col * pitch, top = row * pitch;
+        if(left < numberBounds.right && left + tileSize > numberBounds.left &&
+           top < numberBounds.bottom && top + tileSize > numberBounds.top){
+          const cell = document.createElement('div');
+          cell.className = 'number-cell';
+          cell.setAttribute('aria-hidden','true');
+          const x = Math.max(left,numberBounds.left), y = Math.max(top,numberBounds.top);
+          cell.style.left = (x-infoBounds.left)+'px';
+          cell.style.top = (y-infoBounds.top)+'px';
+          cell.style.width = (Math.min(left+tileSize,numberBounds.right)-x)+'px';
+          cell.style.height = (Math.min(top+tileSize,numberBounds.bottom)-y)+'px';
+          cell.style.setProperty('--delay',delay+'ms');
+          const text = document.createElement('span');
+          text.className = 'pct';
+          text.textContent = pct.textContent;
+          text.style.left = (numberBounds.left-x)+'px';
+          text.style.top = (numberBounds.top-y)+'px';
+          cell.appendChild(text);
+          info.appendChild(cell);
+          numberCopies.push(text);
+          all.push({el:cell,end:delay+duration});
+        }
+        if(left < logoBounds.right && left + tileSize > logoBounds.left &&
+           top < logoBounds.bottom && top + tileSize > logoBounds.top){
+          const cell = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          cell.setAttribute('class','logo-cell');
+          cell.setAttribute('x',816 + (left-logoBounds.left)*svgScale);
+          cell.setAttribute('y',297 + (top-logoBounds.top)*svgScale);
+          cell.setAttribute('width',tileSize*svgScale);
+          cell.setAttribute('height',tileSize*svgScale);
+          cell.style.setProperty('--delay',delay+'ms');
+          maskCells.appendChild(cell);
+          all.push({el:cell,end:delay+duration});
+        }
+      }
+    }
+    return all;
+  }
+
+  function clearTimers(){timers.forEach(clearTimeout);timers=[];cancelAnimationFrame(raf);cancelAnimationFrame(growRaf)}
+
+  function animateProgress(duration){
+    const start = performance.now();
+    const step = now => {
+      const p = Math.min(1,(now-start)/duration);
+      const eased = 1 - Math.pow(1-p,2.35);
+      setProgress(String(Math.round(eased*100)).padStart(3,'0'));
+      if(p<1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
+
+  function play(){
+    clearTimers();
+    ready=false;zooming=false;targetZoom=0;currentZoom=0;zoomVelocity=0;
+    info.classList.remove('digits-gone');
+    tilesEl.classList.remove('flat');
+    hint.classList.remove('visible');
+    info.classList.remove('solid');
+    logo.classList.remove('solid');
+    loader.classList.remove('fade');
+    tilesEl.classList.remove('settled');
+    loader.style.display = 'block';
+    loader.style.visibility='visible';
+    hidePortal();
+    prepareCanvas();
+    loader.style.opacity = '';
+    heroMask.classList.remove('active');
+    logo.classList.remove('reveal');
+    logo.style.opacity = '';
+    zoomBase=logo.getBoundingClientRect().width;
+    // Enlarge until the middle bar covers every viewport edge, with a safety margin.
+    const targetScale=Math.max((canvasWidth/2+8)/138,(canvasHeight/2+8)/34);
+    zoomRatio=Math.max(1.01,288*targetScale/zoomBase);
+    zoomEndProgress=1;
+
+    setProgress('000');
+
+    const tiles = buildTiles();
+    void tilesEl.offsetWidth;
+    tiles.forEach(({el}) => el.classList.add('in'));
+    const tileEnd = Math.max(...tiles.map(t=>t.end));
+    const progressDuration = reduce ? 30 : tileEnd + 160;
+    animateProgress(progressDuration);
+
+    const settleStart = reduce ? 20 : tileEnd + 90;
+    timers.push(setTimeout(() => {
+      tilesEl.classList.add('settled');
+    }, settleStart));
+
+    const revealStart = reduce ? 40 : tileEnd + 470;
+    timers.push(setTimeout(() => {
+      setProgress('100');
+      // Render one black text layer after the wave: no white antialiased underlay.
+      info.classList.add('solid');
+      logo.classList.add('solid');
+      // Collapse completed cells so scrolling no longer composites hundreds of tiles.
+      tilesEl.classList.add('flat');
+      tilesEl.replaceChildren();
+      info.querySelectorAll('.number-cell').forEach(el=>el.remove());
+      numberCopies=[];
+      ready=true;
+      hint.classList.add('visible');
+    }, revealStart));
+  }
+
+  replay.addEventListener('click', play);
+  let resizeTimer;
+  addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(play,180)});
+  play();
+})();
+</script>
+<script type="module" src="./hero.js"></script>
+<script type="module" src="./app-components.jsx"></script>
+</body>
+</html>

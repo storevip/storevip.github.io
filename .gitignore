@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Vite cache
+.vite/
+
+# macOS / ExFAT metadata
+.DS_Store
+._*
+
+# Local backup files
+*.backup
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+
+# Archived source materials
+archive/
