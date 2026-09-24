@@ -3,7 +3,7 @@ import OptionWheel from './OptionWheel';
 import { createWheelClickSound } from './wheel-click-sound.js';
 import './NavigationWheel.css';
 
-const items = ['Home', 'About', 'Work', 'Motion', 'Poster', 'Branding', 'Digital', 'Photography'];
+const items = ['Home', 'Work', 'Motion', 'Visual', 'Presentation', 'Digital', 'About'];
 export default function NavigationWheel() {
   const [light, setLight] = useState(false);
   useEffect(() => {
@@ -58,16 +58,15 @@ export default function NavigationWheel() {
     return () => { app.inert = false; document.documentElement.style.overflow = previousOverflow; window.removeEventListener('keydown', key); toggle.current?.focus(); };
   }, [open]);
   const navigate = (index) => {
-    const journey = document.getElementById('heroJourney');
-    const max = journey.offsetHeight - innerHeight;
-    const progress = index === 0 ? 0 : index === 1 ? (.78 / 1.78) : 1;
+    const ids = ['top', 'selectedWork', 'motion', 'visual', 'presentation', 'digital', 'about'];
+    const target = document.getElementById(ids[index]);
     setOpen(false);
-    requestAnimationFrame(() => window.scrollTo({ top: journey.offsetTop + max * progress, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }));
+    requestAnimationFrame(() => window.scrollTo({ top: index === 0 ? 0 : target.getBoundingClientRect().top + window.scrollY - 90, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }));
   };
   return <div className={`wheel-navigation${ready ? ' is-ready' : ''}${open ? ' is-open' : ''}${light ? ' is-light' : ''}`}>
     <div className="wheel-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
     <div ref={panel} id="wheel-menu" className="wheel-panel" role="dialog" aria-modal={open ? true : undefined} aria-label="网站导航" inert={!open}>
-      {open && <OptionWheel items={items} defaultSelected={selected} textColor={light ? "#45453e" : "#a6a6a6"} activeColor={light ? "#171714" : "#ffffff"} side="right" fontSize={3} spacing={1.65} curve={1.3} tilt={9} blur={2} fade={.25} smoothing={200} inset={80} loop draggable soundUrl="/sounds/click-soft.wav" soundVolume={.5} onSoundTick={() => clickSound.current?.play()} onChange={index => setSelected(index)} onActivate={navigate} />}
+      {open && <OptionWheel items={items} defaultSelected={selected} textColor={light ? "#45453e" : "#a6a6a6"} activeColor={light ? "#171714" : "#ffffff"} side="right" fontSize={3} spacing={1.65} curve={1.3} tilt={9} blur={2} fade={.25} smoothing={120} inset={80} loop draggable soundUrl="/sounds/click-soft.wav" soundVolume={.5} onSoundTick={() => clickSound.current?.play()} onChange={index => setSelected(index)} onActivate={navigate} />}
     </div>
     <button ref={toggle} className="wheel-toggle" aria-label={open ? '关闭导航' : '打开导航'} aria-expanded={open} aria-controls="wheel-menu" onClick={handleToggle} tabIndex={ready ? 0 : -1}><span /><span /></button>
   </div>;

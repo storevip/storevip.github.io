@@ -197,14 +197,15 @@ const OptionWheel = ({
     if (!el) return;
     const onWheel = e => {
       e.preventDefault();
+      e.stopPropagation();
       const cfg = cfgRef.current;
-      const delta = e.deltaMode === 1 ? e.deltaY * 24 : e.deltaY;
-      // Cap each event at one step so notchy mouse wheels move exactly one
-      // option per click, while touchpads still scroll continuously.
-      const step = Math.max(-1, Math.min(1, delta / cfg.rowH));
-      applyTarget(targetRef.current + step, false);
+      const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? el.clientHeight : 1);
+      if (Math.abs(delta) < .5) return;
+      // Small input stays precise; larger/faster gestures accumulate without a one-item cap.
+      const gain = 1 + Math.min(1.5, Math.abs(delta) / 100);
+      applyTarget(targetRef.current + delta * gain / (cfg.rowH * 2.8), false);
       if (wheelTimerRef.current) clearTimeout(wheelTimerRef.current);
-      wheelTimerRef.current = setTimeout(() => applyTarget(targetRef.current, true), 140);
+      wheelTimerRef.current = setTimeout(() => applyTarget(targetRef.current, true), 150);
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => {

@@ -67,7 +67,7 @@ function makeTextTexture() {
   return { canvas, texture };
 }
 
-function HeroGlassScene({ heroSelector = '.lens-hero', fieldSelector = '#heroShapeWavesMount .shape-waves__lens-source' }) {
+function HeroGlassScene({ heroSelector = '.hero-home', fieldSelector = '#heroShapeWavesMount .shape-waves__lens-source' }) {
   const heroRef = useRef(null);
   const lensRef = useRef(null);
   const matRef = useRef(null);
@@ -217,6 +217,8 @@ function HeroGlassScene({ heroSelector = '.lens-hero', fieldSelector = '#heroSha
     hero.style.setProperty('--lens-reveal', String(visibleOpacity));
     // Settle the optical effect first, then hand over to the native Chinese layer.
     const glassSettle = THREE.MathUtils.smoothstep(lensGrowth, 0.48, 0.86);
+    const departure = THREE.MathUtils.clamp(parseFloat(hero.style.getPropertyValue('--lens-departure')) || 0, 0, 1);
+    const opticalSettle = Math.max(glassSettle, departure);
     const crispReveal = THREE.MathUtils.smoothstep(lensGrowth, 0.86, 0.98);
     hero.style.setProperty('--chinese-crisp', String(crispReveal * opacity));
 
@@ -235,17 +237,17 @@ function HeroGlassScene({ heroSelector = '.lens-hero', fieldSelector = '#heroSha
 
       const tiltY = THREE.MathUtils.clamp(targetX / Math.max(0.001, lensViewport.width * 0.5), -1, 1) * 0.045;
       const tiltX = THREE.MathUtils.clamp(-targetY / Math.max(0.001, lensViewport.height * 0.5), -1, 1) * 0.035;
-      lensRef.current.rotation.x = THREE.MathUtils.lerp(lensRef.current.rotation.x, tiltX * (1 - glassSettle), 0.08);
-      lensRef.current.rotation.y = THREE.MathUtils.lerp(lensRef.current.rotation.y, tiltY * (1 - glassSettle), 0.08);
+      lensRef.current.rotation.x = THREE.MathUtils.lerp(lensRef.current.rotation.x, tiltX * (1 - opticalSettle), 0.08);
+      lensRef.current.rotation.y = THREE.MathUtils.lerp(lensRef.current.rotation.y, tiltY * (1 - opticalSettle), 0.08);
 
-      const zScale = THREE.MathUtils.lerp(THREE.MathUtils.lerp(0.2, 0.26, glassStrength), 0.001, glassSettle);
+      const zScale = THREE.MathUtils.lerp(THREE.MathUtils.lerp(0.2, 0.26, glassStrength), 0.001, opticalSettle);
       lensRef.current.scale.set(worldRadius, worldRadius, worldRadius * zScale);
       lensRef.current.visible = visibleOpacity > 0.002 && radius > 0.5 && crispReveal < 1;
     }
 
     if (matRef.current) {
-      matRef.current.ior = THREE.MathUtils.lerp(1.035, 1, glassSettle);
-      matRef.current.thickness = 0.65 * (1 - glassSettle);
+      matRef.current.ior = THREE.MathUtils.lerp(1.035, 1, opticalSettle);
+      matRef.current.thickness = 0.65 * (1 - opticalSettle);
       matRef.current.chromaticAberration = 0.06 * (1 - glassSettle);
       matRef.current.anisotropy = 0.01 * (1 - glassSettle);
       // Native text sits beneath the glass. Keep it opaque during the handoff

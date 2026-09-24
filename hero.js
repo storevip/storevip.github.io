@@ -3,7 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const hero = document.querySelector('.lens-hero');
+const hero = document.querySelector('.hero-home');
 const journey = document.querySelector('#heroJourney');
 const loader = document.querySelector('#loader');
 const nav = document.querySelector('.editorial-nav');
@@ -33,52 +33,23 @@ let previousPointerX = targetX;
 let previousPointerY = targetY;
 let previousPointerTime = performance.now();
 
-const state = { growth: 0, exit: 0 };
-let pageTravel = 0;
-let pageVelocity = 0;
-gsap.set('.selected-section', { y: 0, yPercent: 100 });
-const setPageY = gsap.quickSetter('.selected-section', 'yPercent');
+const state = { growth: 0, departure: 0 };
 const timeline = gsap.timeline({ paused: true });
-timeline.to({}, { duration: 1.78 });
-
-const lineDirections = [
-  ['.line-one', -1, .012],
-  ['.line-two', 1, .035],
-  ['.line-three', -1, .058],
-  ['.line-four', 1, .081]
-];
-
-function getExitX(target, direction) {
-  const rect = target.getBoundingClientRect();
-  const overshoot = Math.max(100, innerWidth * .08);
-  return direction < 0
-    ? -(rect.right + overshoot)
-    : innerWidth - rect.left + overshoot;
-}
-
-// Alternating line exits. No opacity fade: every line physically clears the viewport.
-for (const [lineClass, direction, startAt] of lineDirections) {
-  for (const layerClass of ['.english-layer']) {
-    timeline.to(`${layerClass} ${lineClass}`, {
-      x: (_, target) => getExitX(target, direction),
-      duration: .62,
-      ease: 'power3.inOut'
-    }, startAt);
-  }
-}
-
-timeline
-  .to(state, { growth: .18, duration: .18, ease: 'power1.inOut' }, .27)
-  .to(state, { growth: 1, duration: .30, ease: 'power1.inOut' }, .45)
-  .to(state, { exit: 1, duration: .96, ease: 'power2.inOut' }, .82)
-  .to('.intro-replay', { autoAlpha: 1, duration: .08 }, 1.70);
+timeline.to({}, { duration: 1 });
+timeline.to(state, { departure: 1, duration: .12, ease: 'power1.out' }, .02);
+timeline.to('.hero-shape-waves-mount', { yPercent: 12, duration: .64, ease: 'power2.inOut' }, .02);
+['one', 'two', 'three', 'four'].forEach((line, index) => {
+  timeline.to(`.english-layer .line-${line}, .chinese-layer .line-${line}`, {
+    y: () => -innerHeight * .24, duration: .44, ease: 'power2.inOut'
+  }, .015 + index * .045);
+});
 
 const trigger = ScrollTrigger.create({
   trigger: journey,
   start: 'top top',
-  end: 'bottom bottom',
+  end: 'bottom top',
   animation: timeline,
-  scrub: reduced ? true : .28,
+  scrub: reduced ? true : .85,
   invalidateOnRefresh: true
 });
 trigger.disable();
@@ -101,14 +72,14 @@ function lock() {
   timeline.progress(0);
   window.scrollTo(0, 0);
   visibility = 0;
-  pageTravel = 0;
-  pageVelocity = 0;
-  setPageY(100);
+  document.querySelector('.opening-sequence').style.transform = '';
+
   hero.style.setProperty('--radius', '1px');
   hero.style.setProperty('--lens-opacity', '0');
   hero.style.setProperty('--glass-strength', '1');
   hero.style.setProperty('--lens-speed', '0');
   hero.style.setProperty('--lens-growth', '0');
+  hero.style.setProperty('--lens-departure', '0');
   hero.style.setProperty('--lens-reveal', '0');
 }
 
@@ -132,7 +103,7 @@ function updatePointer(event) {
   const now = performance.now();
   const dt = Math.max(8, Math.min(80, now - previousPointerTime));
   const nextX = event.clientX;
-  const nextY = event.clientY;
+  const nextY = event.clientY - hero.getBoundingClientRect().top;
   targetVX = (nextX - previousPointerX) / dt;
   targetVY = (nextY - previousPointerY) / dt;
   previousPointerX = nextX;
@@ -145,7 +116,7 @@ function updatePointer(event) {
 hero.addEventListener('pointerenter', event => {
   if (!live) return;
   targetX = event.clientX;
-  targetY = event.clientY;
+  targetY = event.clientY - hero.getBoundingClientRect().top;
   lensX = targetX;
   lensY = targetY;
   resetPointerVelocity(targetX, targetY);
@@ -157,7 +128,7 @@ hero.addEventListener('pointerleave', () => { inside = false; });
 hero.addEventListener('pointerdown', event => {
   if (!coarse || !live) return;
   targetX = event.clientX;
-  targetY = event.clientY;
+  targetY = event.clientY - hero.getBoundingClientRect().top;
   inside = true;
   resetPointerVelocity(targetX, targetY);
 });
@@ -187,23 +158,11 @@ function frame(now) {
   const canRender = !document.hidden && pageFocused;
 
   if (live) {
-    // Critically damped following: acceleration builds, then settles without overshoot.
-    const dt = delta / 1000;
-    if (reduced) { pageTravel = state.exit; pageVelocity = 0; }
-    else {
-      const omega = 6.5;
-      const offset = pageTravel - state.exit;
-      const impulse = pageVelocity + omega * offset;
-      const decay = Math.exp(-omega * dt);
-      pageTravel = state.exit + (offset + impulse * dt) * decay;
-      pageVelocity = (pageVelocity - omega * impulse * dt) * decay;
-      if (Math.abs(pageTravel - state.exit) < .0001 && Math.abs(pageVelocity) < .001) {
-        pageTravel = state.exit; pageVelocity = 0;
-      }
-    }
-    setPageY((1 - clamp(pageTravel)) * 100);
+    // Continuous slower travel: no pinned/stopped phase, no gap at the hero/banner seam.
+    const opening = document.querySelector('.opening-sequence');
+    opening.style.transform = `translate3d(0,${reduced ? 0 : Math.min(window.scrollY, opening.offsetHeight / .82) * .18}px,0)`;
     const growing = state.growth > .001;
-    const visible = inside || coarse || growing;
+    const visible = (inside || coarse) && hero.getBoundingClientRect().bottom > 0;
     visibility = mix(visibility, visible ? 1 : 0, 1 - Math.exp(-delta / 115));
 
     const lensBlend = 1 - Math.exp(-delta / 118);
@@ -223,9 +182,10 @@ function frame(now) {
     hero.style.setProperty('--glass-strength', String(glassStrength));
     hero.style.setProperty('--lens-speed', String(speed));
     hero.style.setProperty('--lens-growth', String(state.growth));
+    hero.style.setProperty('--lens-departure', String(state.departure));
 
-    nav.classList.toggle('work-visible', pageTravel > .96);
-    const surface = pageTravel > .5 ? 'light' : 'dark';
+    const surface = document.querySelector('.statement-stage').getBoundingClientRect().top < height * .5 || document.querySelector('#selectedWork').getBoundingClientRect().top < height * .5 ? 'light' : 'dark';
+    nav.classList.toggle('work-visible', document.querySelector('.statement-stage').getBoundingClientRect().top < 60 || document.querySelector('.idea-section').getBoundingClientRect().top < 60);
     if (document.documentElement.dataset.menuSurface !== surface) document.documentElement.dataset.menuSurface = surface;
   }
 
@@ -253,3 +213,36 @@ addEventListener('focus', () => {
   lastFrame = performance.now();
 });
 addEventListener('blur', () => { pageFocused = false; });
+
+// Smooth the opening's vertical travel without coupling the horizontal marquee to input.
+let scrollTarget = window.scrollY;
+let scrollFrame = 0;
+let scrollTime = 0;
+function settleOpeningScroll(now) {
+  const dt = Math.min(48, now - scrollTime || 16);
+  scrollTime = now;
+  if (!live || document.querySelector('#app').inert) { scrollFrame = 0; return; }
+  const next = mix(window.scrollY, scrollTarget, 1 - Math.exp(-dt / 180));
+  window.scrollTo(0, Math.abs(scrollTarget - next) < .8 ? scrollTarget : next);
+  scrollFrame = Math.abs(scrollTarget - window.scrollY) > .8 ? requestAnimationFrame(settleOpeningScroll) : 0;
+}
+window.addEventListener('wheel', event => {
+  const idea = document.querySelector('.idea-section');
+  if (!live || reduced || event.ctrlKey || event.defaultPrevented || document.querySelector('#app').inert || idea.getBoundingClientRect().bottom < 0) return;
+  event.preventDefault();
+  if (!scrollFrame) { scrollTarget = window.scrollY; scrollTime = performance.now(); }
+  const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
+  scrollTarget = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, scrollTarget + delta));
+  if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
+}, { passive: false });
+
+if (!reduced) {
+  // Each line starts when that line enters view, rather than finishing offscreen.
+  gsap.utils.toArray('.idea-line > span').forEach(line => {
+    gsap.fromTo(line, { yPercent: 115 }, { yPercent: 0, duration: 1.35, ease: 'power3.out', scrollTrigger: { trigger: line.parentElement, start: 'top 90%', toggleActions: 'play none none reverse', invalidateOnRefresh: true } });
+  });
+  const badge = document.querySelector('.idea-badge');
+  const rotation = gsap.to('.badge-teeth', { rotation: 360, duration: 28, repeat: -1, ease: 'none' });
+  badge.addEventListener('pointerenter', () => gsap.to(rotation, { timeScale: 5, duration: .65, overwrite: true }));
+  badge.addEventListener('pointerleave', () => gsap.to(rotation, { timeScale: 1, duration: 1.1, overwrite: true }));
+}
