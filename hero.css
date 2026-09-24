@@ -394,3 +394,9 @@ html.hero-live .opening-sequence { position: relative; top: auto; z-index: 5; wi
 .idea-tagline { font: 700 12vw/1.02 "DINish", sans-serif; letter-spacing: -.045em; margin-top: 0; }
 .idea-badge { width: 18vw; right: 3.8vw; top: 32%; }
 @media (max-width:650px) { .idea-section { padding-bottom: 6vw; } .idea-badge { top: 32%; bottom: auto; } }
+
+/* Allow the draggable badge to cross the statement edges without clipping. */
+.idea-section { overflow: visible; z-index: 8; }
+.idea-badge { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.idea-badge.is-dragging { cursor: grabbing; }
+.idea-badge svg { pointer-events: none; }

@@ -246,3 +246,29 @@ if (!reduced) {
   badge.addEventListener('pointerenter', () => gsap.to(rotation, { timeScale: 5, duration: .65, overwrite: true }));
   badge.addEventListener('pointerleave', () => gsap.to(rotation, { timeScale: 1, duration: 1.1, overwrite: true }));
 }
+
+// Drag the badge as a whole; only its separate teeth layer rotates.
+const draggableBadge = document.querySelector('.idea-badge');
+let badgeDrag = null;
+let badgeOffset = { x: 0, y: 0 };
+draggableBadge.addEventListener('pointerdown', event => {
+  if (!event.isPrimary || event.button !== 0) return;
+  event.preventDefault();
+  badgeDrag = { id: event.pointerId, x: event.pageX, y: event.pageY, startX: badgeOffset.x, startY: badgeOffset.y };
+  draggableBadge.setPointerCapture(event.pointerId);
+  draggableBadge.classList.add('is-dragging');
+});
+draggableBadge.addEventListener('pointermove', event => {
+  if (!badgeDrag || badgeDrag.id !== event.pointerId) return;
+  badgeOffset = { x: badgeDrag.startX + event.pageX - badgeDrag.x, y: badgeDrag.startY + event.pageY - badgeDrag.y };
+  gsap.set(draggableBadge, badgeOffset);
+});
+function releaseBadge(event) {
+  if (!badgeDrag || event.pointerId !== badgeDrag.id) return;
+  badgeDrag = null;
+  draggableBadge.classList.remove('is-dragging');
+  if (draggableBadge.hasPointerCapture(event.pointerId)) draggableBadge.releasePointerCapture(event.pointerId);
+}
+draggableBadge.addEventListener('pointerup', releaseBadge);
+draggableBadge.addEventListener('pointercancel', releaseBadge);
+draggableBadge.addEventListener('lostpointercapture', releaseBadge);

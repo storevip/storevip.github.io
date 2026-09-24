@@ -160,3 +160,8 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Latest reference supersedes the earlier mixed-case statement: four uppercase DINish lines at 12vw, including the final line at full size. Banner typography unchanged.
 - Each statement line triggers its own 1.35s masked upward entrance when entering the viewport, preventing offscreen completion. Browser checked entering and completed states; build passed.
 - Saving the approved accumulated changes to the existing GitHub origin/main.
+
+### Draggable badge
+- Badge supports primary-pointer drag with pointer capture and stays at its released position for the current page session.
+- Teeth rotation and hover acceleration remain independent of the stationary logo.
+- Statement section allows the badge to cross its edges without clipping.
