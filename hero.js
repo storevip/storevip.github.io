@@ -40,8 +40,8 @@ timeline.to(state, { departure: 1, duration: .12, ease: 'power1.out' }, .02);
 timeline.to('.hero-shape-waves-mount', { yPercent: 12, duration: .64, ease: 'power2.inOut' }, .02);
 ['one', 'two', 'three', 'four'].forEach((line, index) => {
   timeline.to(`.english-layer .line-${line}, .chinese-layer .line-${line}`, {
-    y: () => -innerHeight * .24, duration: .44, ease: 'power2.inOut'
-  }, .015 + index * .045);
+    y: () => -innerHeight * .12, duration: .78, ease: 'power2.inOut'
+  }, .04 + index * .055);
 });
 
 const trigger = ScrollTrigger.create({
@@ -184,8 +184,10 @@ function frame(now) {
     hero.style.setProperty('--lens-growth', String(state.growth));
     hero.style.setProperty('--lens-departure', String(state.departure));
 
-    const surface = document.querySelector('.statement-stage').getBoundingClientRect().top < height * .5 || document.querySelector('#selectedWork').getBoundingClientRect().top < height * .5 ? 'light' : 'dark';
-    nav.classList.toggle('work-visible', document.querySelector('.statement-stage').getBoundingClientRect().top < 60 || document.querySelector('.idea-section').getBoundingClientRect().top < 60);
+    const bannerRect = document.querySelector('.statement-stage').getBoundingClientRect();
+    const workRect = document.querySelector('#selectedWork').getBoundingClientRect();
+    const surface = ((bannerRect.top < height * .5 && bannerRect.bottom > height * .5) || workRect.top < height * .5) ? 'light' : 'dark';
+    nav.classList.toggle('work-visible', (bannerRect.top < 60 && bannerRect.bottom > 60) || workRect.top < 60);
     if (document.documentElement.dataset.menuSurface !== surface) document.documentElement.dataset.menuSurface = surface;
   }
 
@@ -228,48 +230,11 @@ function settleOpeningScroll(now) {
   scrollFrame = Math.abs(scrollTarget - window.scrollY) > .8 ? requestAnimationFrame(settleOpeningScroll) : 0;
 }
 window.addEventListener('wheel', event => {
-  const idea = document.querySelector('.idea-section');
-  if (!live || reduced || event.ctrlKey || event.defaultPrevented || document.querySelector('#app').inert || idea.getBoundingClientRect().bottom < 0) return;
+  const brandSection = document.querySelector('.brand-section');
+  if (!live || reduced || event.ctrlKey || event.defaultPrevented || document.querySelector('#app').inert || brandSection.getBoundingClientRect().bottom < 0) return;
   event.preventDefault();
   if (!scrollFrame) { scrollTarget = window.scrollY; scrollTime = performance.now(); }
   const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
   scrollTarget = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, scrollTarget + delta));
   if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
 }, { passive: false });
-
-if (!reduced) {
-  // Each line starts when that line enters view, rather than finishing offscreen.
-  gsap.utils.toArray('.idea-line > span').forEach(line => {
-    gsap.fromTo(line, { yPercent: 115 }, { yPercent: 0, duration: 1.35, ease: 'power3.out', scrollTrigger: { trigger: line.parentElement, start: 'top 90%', toggleActions: 'play none none reverse', invalidateOnRefresh: true } });
-  });
-  const badge = document.querySelector('.idea-badge');
-  const rotation = gsap.to('.badge-teeth', { rotation: 360, duration: 28, repeat: -1, ease: 'none' });
-  badge.addEventListener('pointerenter', () => gsap.to(rotation, { timeScale: 5, duration: .65, overwrite: true }));
-  badge.addEventListener('pointerleave', () => gsap.to(rotation, { timeScale: 1, duration: 1.1, overwrite: true }));
-}
-
-// Drag the badge as a whole; only its separate teeth layer rotates.
-const draggableBadge = document.querySelector('.idea-badge');
-let badgeDrag = null;
-let badgeOffset = { x: 0, y: 0 };
-draggableBadge.addEventListener('pointerdown', event => {
-  if (!event.isPrimary || event.button !== 0) return;
-  event.preventDefault();
-  badgeDrag = { id: event.pointerId, x: event.pageX, y: event.pageY, startX: badgeOffset.x, startY: badgeOffset.y };
-  draggableBadge.setPointerCapture(event.pointerId);
-  draggableBadge.classList.add('is-dragging');
-});
-draggableBadge.addEventListener('pointermove', event => {
-  if (!badgeDrag || badgeDrag.id !== event.pointerId) return;
-  badgeOffset = { x: badgeDrag.startX + event.pageX - badgeDrag.x, y: badgeDrag.startY + event.pageY - badgeDrag.y };
-  gsap.set(draggableBadge, badgeOffset);
-});
-function releaseBadge(event) {
-  if (!badgeDrag || event.pointerId !== badgeDrag.id) return;
-  badgeDrag = null;
-  draggableBadge.classList.remove('is-dragging');
-  if (draggableBadge.hasPointerCapture(event.pointerId)) draggableBadge.releasePointerCapture(event.pointerId);
-}
-draggableBadge.addEventListener('pointerup', releaseBadge);
-draggableBadge.addEventListener('pointercancel', releaseBadge);
-draggableBadge.addEventListener('lostpointercapture', releaseBadge);

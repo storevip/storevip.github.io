@@ -172,3 +172,9 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Mobile lens DPR limited to 1, transmission samples to 6; touch rendering no longer depends on desktop document-focus state.
 - Stable svh hero height and native vertical touch scrolling retained.
 - Production build and diff checks passed. Physical-phone appearance still needs user confirmation.
+
+### Latest: slower hero departure and two logo rows
+- Halved extra upward text offset to 12vh and extended departure to .78 of the scroll timeline.
+- Removed the four-line idea screen and its draggable starburst, including their event handlers.
+- Replaced it with a black section exactly twice the banner height and two autonomous opposing white logo rows. Apple/Tesla/Google/Nike/Adidas/Sony are temporary placeholders; SVG sources documented under public/logos.
+- Menu/logo contrast follows the new black section correctly.
