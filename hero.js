@@ -186,8 +186,9 @@ function frame(now) {
 
     const bannerRect = document.querySelector('.statement-stage').getBoundingClientRect();
     const workRect = document.querySelector('#selectedWork').getBoundingClientRect();
-    const surface = ((bannerRect.top < height * .5 && bannerRect.bottom > height * .5) || workRect.top < height * .5) ? 'light' : 'dark';
-    nav.classList.toggle('work-visible', (bannerRect.top < 60 && bannerRect.bottom > 60) || workRect.top < 60);
+    const aboutRect = document.querySelector('#about').getBoundingClientRect();
+    const surface = ((bannerRect.top < height * .5 && bannerRect.bottom > height * .5) || (workRect.top < height * .5 && aboutRect.top > height * .5)) ? 'light' : 'dark';
+    nav.classList.toggle('work-visible', (bannerRect.top < 60 && bannerRect.bottom > 60) || (workRect.top < 60 && aboutRect.top > 60));
     if (document.documentElement.dataset.menuSurface !== surface) document.documentElement.dataset.menuSurface = surface;
   }
 
@@ -238,3 +239,6 @@ window.addEventListener('wheel', event => {
   scrollTarget = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, scrollTarget + delta));
   if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
 }, { passive: false });
+
+// One continuous line grows with scroll and gently catches up after input stops.
+gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 75%', end: 'bottom 70%', scrub: reduced ? true : 1.25 } });

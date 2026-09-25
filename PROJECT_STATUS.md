@@ -178,3 +178,10 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Removed the four-line idea screen and its draggable starburst, including their event handlers.
 - Replaced it with a black section exactly twice the banner height and two autonomous opposing white logo rows. Apple/Tesla/Google/Nike/Adidas/Sony are temporary placeholders; SVG sources documented under public/logos.
 - Menu/logo contrast follows the new black section correctly.
+
+### Latest: Work / About reference layout
+- Logo section tightened to clamp(250px, 40vh, 470px); first row moves right, second left.
+- Work follows marginalman.net/work/list/all: large title, thin dividers, image-left / description-right rows. Uses existing DINish and Source Han Serif; actual project assets remain placeholders.
+- Yellow SVG curve draws progressively through Work with 1.25s scroll smoothing.
+- Restored About anchor with black background/yellow text, large About title, Profile/Career/Qualifications/Contact sections. Personal details remain clearly marked for replacement, not copied from the reference author's biography.
+- Existing home, lens, loader and mobile compatibility retained. Build passed.
