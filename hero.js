@@ -241,4 +241,4 @@ window.addEventListener('wheel', event => {
 }, { passive: false });
 
 // One continuous line grows with scroll and gently catches up after input stops.
-gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 75%', end: 'bottom 70%', scrub: reduced ? true : 1.25 } });
+gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 75%', end: 'bottom 35%', scrub: reduced ? true : 1.8 } });

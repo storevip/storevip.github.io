@@ -185,3 +185,6 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Yellow SVG curve draws progressively through Work with 1.25s scroll smoothing.
 - Restored About anchor with black background/yellow text, large About title, Profile/Career/Qualifications/Contact sections. Personal details remain clearly marked for replacement, not copied from the reference author's biography.
 - Existing home, lens, loader and mobile compatibility retained. Build passed.
+
+### Curve refinement
+- Yellow curve increased from 3px to 10px, round caps and joins. Starts outside the left edge, with looping turns; scroll drawing extends to bottom 35% and uses 1.8s catch-up.
