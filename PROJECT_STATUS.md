@@ -197,3 +197,7 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 - Work heading, covers and descriptions gently scale from .91 to 1 over 1.6s with a restrained overshoot as each enters view.
 - Yellow gesture follows the supplied left-entry loop sketch; 24px round stroke (15px mobile), visible over project imagery, sized to heading + first row.
 - Work stays in front while About travels more slowly behind it, revealing as Work moves upward; no opacity transition or scroll pin.
+
+### Curve continuity and About spacing
+- Replaced normalized dashed visible stroke with solid ink revealed by a separate SVG mask using measured path length. Preserves the path, round tip, thickness and scroll pacing.
+- Increased About title top padding to clamp(190px, 22vw, 380px), and bottom padding to clamp(38px, 4vw, 70px).
