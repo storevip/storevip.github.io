@@ -225,14 +225,22 @@ let scrollTime = 0;
 function settleOpeningScroll(now) {
   const dt = Math.min(48, now - scrollTime || 16);
   scrollTime = now;
-  if (!live || document.querySelector('#app').inert) { scrollFrame = 0; return; }
+  if (!live || document.querySelector('#app').inert || document.querySelector('.brand-section').getBoundingClientRect().bottom <= 0) { scrollFrame = 0; scrollTarget = window.scrollY; return; }
+  const before = window.scrollY;
+  if (Math.abs(scrollTarget - before) <= 2) { window.scrollTo(0, scrollTarget); scrollFrame = 0; return; }
   const next = mix(window.scrollY, scrollTarget, 1 - Math.exp(-dt / 180));
   window.scrollTo(0, Math.abs(scrollTarget - next) < .8 ? scrollTarget : next);
-  scrollFrame = Math.abs(scrollTarget - window.scrollY) > .8 ? requestAnimationFrame(settleOpeningScroll) : 0;
+  // Some browsers round scroll positions: stop if the remaining eased step cannot move.
+  if (Math.abs(window.scrollY - before) < .1) { window.scrollTo(0, scrollTarget); scrollFrame = 0; return; }
+  scrollFrame = Math.abs(scrollTarget - window.scrollY) > 2 ? requestAnimationFrame(settleOpeningScroll) : 0;
 }
 window.addEventListener('wheel', event => {
   const brandSection = document.querySelector('.brand-section');
-  if (!live || reduced || event.ctrlKey || event.defaultPrevented || document.querySelector('#app').inert || brandSection.getBoundingClientRect().bottom < 0) return;
+  if (!live || reduced || event.ctrlKey || event.defaultPrevented || document.querySelector('#app').inert ) return;
+  if (brandSection.getBoundingClientRect().bottom <= 0) {
+    cancelAnimationFrame(scrollFrame); scrollFrame = 0; scrollTarget = window.scrollY;
+    return;
+  }
   event.preventDefault();
   if (!scrollFrame) { scrollTarget = window.scrollY; scrollTime = performance.now(); }
   const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
@@ -241,4 +249,4 @@ window.addEventListener('wheel', event => {
 }, { passive: false });
 
 // One continuous line grows with scroll and gently catches up after input stops.
-gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 75%', end: 'bottom 35%', scrub: reduced ? true : 1.8 } });
+gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 55%', end: 'bottom top', scrub: reduced ? true : .7 } });

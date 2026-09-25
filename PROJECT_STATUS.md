@@ -188,3 +188,7 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 
 ### Curve refinement
 - Yellow curve increased from 3px to 10px, round caps and joins. Starts outside the left edge, with looping turns; scroll drawing extends to bottom 35% and uses 1.8s catch-up.
+
+### Work scroll handoff fix
+- Opening scroll RAF now ends on entry into Work and releases native wheel scrolling. Added a rounding/stall guard so subpixel residuals cannot keep restoring an old scroll target.
+- Curve maps to a longer actual scroll range (Work top at 55% through bottom at viewport top), with .7s catch-up to avoid long fast continuation after input ends.
