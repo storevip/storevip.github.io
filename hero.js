@@ -248,5 +248,19 @@ window.addEventListener('wheel', event => {
   if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
 }, { passive: false });
 
-// One continuous line grows with scroll and gently catches up after input stops.
-gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 55%', end: 'bottom top', scrub: reduced ? true : .7 } });
+// Size the drawn gesture to the heading and first project, matching the supplied sketch.
+const curveSvg = document.querySelector('.growing-curve');
+const firstWork = document.querySelector('.work-entry');
+function sizeWorkCurve() {
+  curveSvg.style.height = `${firstWork.offsetTop + firstWork.offsetHeight + document.querySelector('.portfolio-heading').offsetHeight}px`;
+}
+sizeWorkCurve();
+ScrollTrigger.addEventListener('refreshInit', sizeWorkCurve);
+gsap.to('.growing-curve path', { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'top 70%', end: () => `+=${parseFloat(curveSvg.style.height) + innerHeight * .35}`, scrub: reduced ? true : 1.1, invalidateOnRefresh: true } });
+
+if (!reduced) {
+  gsap.utils.toArray('#selectedWork .portfolio-heading h2, .work-entry .project-cover, .work-entry .project-description').forEach(element => {
+    gsap.fromTo(element, { scale: .91 }, { scale: 1, duration: 1.6, ease: 'back.out(1.2)', scrollTrigger: { trigger: element, start: 'top 92%', toggleActions: 'play none none reverse' } });
+  });
+  gsap.fromTo('#about', { y: () => -innerHeight * .35 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'bottom bottom', end: 'bottom top', scrub: .65, invalidateOnRefresh: true } });
+}

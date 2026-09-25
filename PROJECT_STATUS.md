@@ -192,3 +192,8 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 ### Work scroll handoff fix
 - Opening scroll RAF now ends on entry into Work and releases native wheel scrolling. Added a rounding/stall guard so subpixel residuals cannot keep restoring an old scroll target.
 - Curve maps to a longer actual scroll range (Work top at 55% through bottom at viewport top), with .7s catch-up to avoid long fast continuation after input ends.
+
+### Work elastic entry and About reveal
+- Work heading, covers and descriptions gently scale from .91 to 1 over 1.6s with a restrained overshoot as each enters view.
+- Yellow gesture follows the supplied left-entry loop sketch; 24px round stroke (15px mobile), visible over project imagery, sized to heading + first row.
+- Work stays in front while About travels more slowly behind it, revealing as Work moves upward; no opacity transition or scroll pin.
