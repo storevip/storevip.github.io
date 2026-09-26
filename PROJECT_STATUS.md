@@ -204,3 +204,11 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 
 ### 2026-09-26 — Remove yellow curve
 - Removed Work yellow SVG curve, its styling, scroll animation and refresh listener. Work elastic entrance and About reveal/spacing retained.
+
+### 2026-09-27 — Poster gallery, contact entrance and banner reading room
+- Work replaced with a three-column sticky poster window, opposing column travel and red/green/blue artwork placeholders. Category navigation anchors preserved along the gallery journey.
+- Inspected danilodemarco.com public HTML/CSS: three columns use opposite scroll speeds; masked title characters enter over .8s with .2s stagger for Posters and .05s for Contact. Implemented the same entrance structure with existing GSAP.
+- About heading and English introduction retained; removed its Chinese subtitle and replaced detail/contact placeholders with a large Contact / me. layout, black/yellow with existing font. Contact information remains unfilled rather than copying the reference person's details.
+- Navigation button has a sliding spring-like arrival and repeating yellow breathing ring.
+- Added yellow continuation below the banner so the logo surface covers it later, preserving the joined opening and its continuous parallax.
+- Production build passed (existing bundle-size advisory). Live-browser motion comparison remains unverified in this session.

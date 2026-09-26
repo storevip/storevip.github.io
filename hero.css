@@ -444,3 +444,38 @@ html.hero-live .selected-section { z-index: 9; }
 
 /* More breathing room as the Work surface lifts off About. */
 .about-section .portfolio-heading { padding-top: clamp(190px, 22vw, 380px); padding-bottom: clamp(38px, 4vw, 70px); }
+
+/* Poster reference: clipped three-column gallery with opposing vertical travel. */
+html.hero-live .selected-section { background: #000; color: #FFDA00; overflow: visible; }
+#selectedWork .portfolio-heading { border: 0; padding: 7vw 6.25vw 4vw; }
+#selectedWork h2, #about .portfolio-heading h2, .reveal-word { overflow: hidden; }
+.reveal-character { display: inline-block; }
+.poster-journey { position: relative; height: 420vh; }
+.poster-anchor { position: absolute; left: 0; scroll-margin-top: 0; }
+.poster-window { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.poster-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 2vw; padding: 0 2vw; }
+.poster-column { display: flex; flex-direction: column; gap: 2vw; will-change: transform; }
+.poster-placeholder { flex-shrink: 0; width: 100%; aspect-ratio: .71; }
+.poster-color-0 { background: #f02b2b; }
+.poster-color-1 { background: #22ba58; }
+.poster-color-2 { background: #245bff; }
+.about-intro { grid-template-columns: 1fr; }
+.contact-layout { padding: 7vw 6.25vw 5vw; }
+.contact-title { font: 400 clamp(90px,13vw,260px)/1.02 "DINish",sans-serif; letter-spacing: -.045em; margin: 0 0 7vw; }
+.contact-title .reveal-word { display: block; width: fit-content; padding-bottom: .08em; }
+.contact-info { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; margin-left: 50%; font-size: clamp(16px,1.5vw,26px); line-height: 1.5; }
+.contact-info h4, .contact-info p { margin: 0 0 .25em; }
+.contact-info .contact-practice { margin-top: 1.3em; }
+/* Yellow continuation gives the banner reading room before the following surface covers it. */
+html.hero-live .opening-sequence { padding-bottom: 18vh; background: #FFDA00; }
+@media(max-width:650px) {
+  .poster-journey { height: 260svh; }
+  .poster-placeholder { aspect-ratio: .5; }
+  .contact-layout { padding: 70px 20px 50px; }
+  .contact-info { margin-left: 0; gap: 24px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .poster-journey { height: auto; }
+  .poster-window { position: relative; height: auto; }
+  .poster-column { will-change: auto; }
+}

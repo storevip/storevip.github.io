@@ -187,8 +187,8 @@ function frame(now) {
     const bannerRect = document.querySelector('.statement-stage').getBoundingClientRect();
     const workRect = document.querySelector('#selectedWork').getBoundingClientRect();
     const aboutRect = document.querySelector('#about').getBoundingClientRect();
-    const surface = ((bannerRect.top < height * .5 && bannerRect.bottom > height * .5) || (workRect.top < height * .5 && aboutRect.top > height * .5)) ? 'light' : 'dark';
-    nav.classList.toggle('work-visible', (bannerRect.top < 60 && bannerRect.bottom > 60) || (workRect.top < 60 && aboutRect.top > 60));
+    const surface = ((bannerRect.top < height * .5 && bannerRect.bottom > height * .5)) ? 'light' : 'dark';
+    nav.classList.toggle('work-visible', (bannerRect.top < 60 && bannerRect.bottom > 60));
     if (document.documentElement.dataset.menuSurface !== surface) document.documentElement.dataset.menuSurface = surface;
   }
 
@@ -248,9 +248,23 @@ window.addEventListener('wheel', event => {
   if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
 }, { passive: false });
 
-if (!reduced) {
-  gsap.utils.toArray('#selectedWork .portfolio-heading h2, .work-entry .project-cover, .work-entry .project-description').forEach(element => {
-    gsap.fromTo(element, { scale: .91 }, { scale: 1, duration: 1.6, ease: 'back.out(1.2)', scrollTrigger: { trigger: element, start: 'top 92%', toggleActions: 'play none none reverse' } });
+// Reference uses masked character entrances, with slower staggering for Posters.
+for (const heading of document.querySelectorAll('#selectedWork h2, #about .portfolio-heading h2, .contact-title .reveal-word')) {
+  const text = heading.textContent;
+  heading.setAttribute('aria-label', text);
+  heading.innerHTML = [...text].map(char => `<span class="reveal-character" aria-hidden="true">${char}</span>`).join('');
+  if (!reduced) gsap.fromTo(heading.children, { yPercent: 120 }, {
+    yPercent: 0, duration: .8, stagger: heading.closest('#selectedWork') ? .2 : .05,
+    ease: 'power3.out', scrollTrigger: { trigger: heading, start: 'top 78%', toggleActions: 'play none none reverse' }
   });
-  gsap.fromTo('#about', { y: () => -innerHeight * .35 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#selectedWork', start: 'bottom bottom', end: 'bottom top', scrub: .65, invalidateOnRefresh: true } });
+}
+if (!reduced) {
+  gsap.utils.toArray('.poster-column').forEach((column, index) => {
+    const travel = () => Math.max(0, column.scrollHeight - document.querySelector('.poster-window').clientHeight);
+    gsap.fromTo(column, { y: () => index === 1 ? -travel() : 0 }, {
+      y: () => index === 1 ? 0 : -travel(), ease: 'none',
+      scrollTrigger: { trigger: '.poster-journey', start: 'top top', end: 'bottom bottom', scrub: .8, invalidateOnRefresh: true }
+    });
+  });
+  gsap.fromTo('.contact-info > div', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .8, stagger: .15, ease: 'power3.out', scrollTrigger: { trigger: '.contact-info', start: 'top 88%', toggleActions: 'play none none reverse' } });
 }
