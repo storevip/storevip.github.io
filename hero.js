@@ -248,21 +248,6 @@ window.addEventListener('wheel', event => {
   if (!scrollFrame) scrollFrame = requestAnimationFrame(settleOpeningScroll);
 }, { passive: false });
 
-// Size the drawn gesture to the heading and first project, matching the supplied sketch.
-const curveSvg = document.querySelector('.growing-curve');
-const firstWork = document.querySelector('.work-entry');
-function sizeWorkCurve() {
-  curveSvg.style.height = `${firstWork.offsetTop + firstWork.offsetHeight + document.querySelector('.portfolio-heading').offsetHeight}px`;
-}
-sizeWorkCurve();
-ScrollTrigger.addEventListener('refreshInit', sizeWorkCurve);
-// Animate a mask in SVG coordinates: avoids normalized dashes interacting with
-// non-scaling strokes and viewport changes. The visible stroke stays solid.
-const revealStroke = curveSvg.querySelector('.curve-reveal');
-const revealLength = revealStroke.getTotalLength();
-gsap.set(revealStroke, { strokeDasharray: `${revealLength} ${revealLength}`, strokeDashoffset: revealLength });
-gsap.fromTo(revealStroke, { strokeDashoffset: revealLength }, { strokeDashoffset: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '#selectedWork', start: 'top 70%', end: () => `+=${parseFloat(curveSvg.style.height) + innerHeight * .35}`, scrub: reduced ? true : 1.1 } });
-
 if (!reduced) {
   gsap.utils.toArray('#selectedWork .portfolio-heading h2, .work-entry .project-cover, .work-entry .project-description').forEach(element => {
     gsap.fromTo(element, { scale: .91 }, { scale: 1, duration: 1.6, ease: 'back.out(1.2)', scrollTrigger: { trigger: element, start: 'top 92%', toggleActions: 'play none none reverse' } });

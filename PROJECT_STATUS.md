@@ -201,3 +201,6 @@ Keep all unrequested design/features unchanged. Do not resume desktop copies or 
 ### Curve continuity and About spacing
 - Replaced normalized dashed visible stroke with solid ink revealed by a separate SVG mask using measured path length. Preserves the path, round tip, thickness and scroll pacing.
 - Increased About title top padding to clamp(190px, 22vw, 380px), and bottom padding to clamp(38px, 4vw, 70px).
+
+### 2026-09-26 — Remove yellow curve
+- Removed Work yellow SVG curve, its styling, scroll animation and refresh listener. Work elastic entrance and About reveal/spacing retained.
